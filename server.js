@@ -39,8 +39,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/books', (req, res) => {
-  // res.send('User Model');
+  // res.send('User Model'); 
   User.find((err, dataBaseResults) => {
+    console.log('Sick of results', dataBaseResults[0])
     res.send(dataBaseResults);
   });
 });
