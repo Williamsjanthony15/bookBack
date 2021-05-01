@@ -5,13 +5,15 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const PORT = process.env.PORT || 3001;
+const cors = require('cors');
+app.use (cors());
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const User = require('./models/user');
 
 const userInformation = new User({
-  email: 'Williamsjanthony15@yahoo.com',
+  email: 'williamsfamily121317@gmail.com',
   books: [{
     name: 'Kujo',
     description: 'Attack of a killer rabid dog',
@@ -35,14 +37,24 @@ userInformation.save(function (err) {
 });
 
 app.get('/', (req, res) => {
-  res.send('Welcome to my bookBack');
+  User.find((arr, userData) => {
+    res.send(userData);
+  });
+});
+
+// colon at the start of :email makes it a parameter
+app.get('/users/:email', (req, res) => {
+  User.find({email: req.params.email}, (err, userInformation) => {
+    console.log('IM here look at me', User)
+    res.send(userInformation);
+  });
 });
 
 app.get('/books', (req, res) => {
-  // res.send('User Model'); 
-  User.find((err, dataBaseResults) => {
-    console.log('Sick of results', dataBaseResults[0])
-    res.send(dataBaseResults);
+  const user = req.query.email;
+  console.log('this is where im at', user);
+  User.find({email: user}, (err, userInformation) => {
+    res.send(userInformation[0]);
   });
 });
 
