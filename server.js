@@ -3,31 +3,55 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
+
 require('dotenv').config();
+app.use(express.json());
+//only used with Postman
+app.use(express.urlencoded({extended:true}));
+
+
 const PORT = process.env.PORT || 3001;
+
 const cors = require('cors');
 app.use (cors());
+
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const User = require('./models/user');
 
 const userInformation = new User({
-  email: 'williamsfamily121317@gmail.com',
+  // email: 'williamsfamily121317@gmail.com',
+  // books: [{
+  //   name: 'Kujo',
+  //   description: 'Attack of a killer rabid dog',
+  //   status: 'Recommended',
+  // },
+  // {
+  //   name: 'Old Man and the Sea',
+  //   description: 'Fishing Journey',
+  //   status: 'Recommended',
+  // },
+  // {
+  //   name: 'Federalist Papers',
+  //   description: 'Historical Documents',
+  //   status: 'Recommended',
+  // }]
+  email: 'matt.santorsola@gmail.com',
   books: [{
-    name: 'Kujo',
-    description: 'Attack of a killer rabid dog',
-    status: 'Recommend',
+    name: 'The Meditations',
+    description: 'Thoughts of a Roman Emperor',
+    status: 'Recommended',
   },
   {
-    name: 'Old Man and the Sea',
-    description: 'Fishing Journey',
-    status: 'Not Recommended',
+    name: 'Fortune\'s Formula',
+    description: 'how much to bet?',
+    status: 'Recommended',
   },
   {
-    name: 'Federalist Papers',
-    description: 'Historical Documents',
-    status: 'Recommend',
+    name: 'A Farewell to Arms',
+    description: 'A Hemingway classic',
+    status: 'Recommended',
   }]
 });
 
@@ -43,9 +67,10 @@ app.get('/', (req, res) => {
 });
 
 // colon at the start of :email makes it a parameter
+//gets user information based up the email
 app.get('/users/:email', (req, res) => {
   User.find({email: req.params.email}, (err, userInformation) => {
-    console.log('IM here look at me', User)
+    console.log('IM here look at me', userInformation);
     res.send(userInformation);
   });
 });
@@ -58,6 +83,21 @@ app.get('/books', (req, res) => {
   });
 });
 
+app.post('/books', (req, res) => {
+  const {name, description, status} = req.body;
+  const email = req.query.email;
+  const newBook = {name, description, status};
+  console.log(newBook);
+  User.find({email}, (err, userInformation) => {
+    if (!userInformation.length){
+      res.status(400).send('user does not exist');
+    } else {
+      userInformation[0].books.push(newBook);
+      userInformation[0].save().then(res.send(userInformation[0].books));
+    }
+    
+  });
+});
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
