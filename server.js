@@ -7,7 +7,7 @@ const app = express();
 require('dotenv').config();
 app.use(express.json());
 //only used with Postman
-app.use(express.urlencoded({extended:true}));
+// app.use(express.urlencoded({extended:true}));
 
 
 const PORT = process.env.PORT || 3001;
@@ -84,16 +84,17 @@ app.get('/books', (req, res) => {
 });
 
 app.post('/books', (req, res) => {
-  const {name, description, status} = req.body;
-  const email = req.query.email;
+  const {email, name, description, status} = req.body;
   const newBook = {name, description, status};
   console.log(newBook);
+  console.log(email);
   User.find({email}, (err, userInformation) => {
     if (!userInformation.length){
       res.status(400).send('user does not exist');
     } else {
       userInformation[0].books.push(newBook);
       userInformation[0].save().then(res.send(userInformation[0].books));
+      console.log(userInformation[0].books);
     }
     
   });
