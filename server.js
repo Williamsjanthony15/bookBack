@@ -96,7 +96,22 @@ app.post('/books', (req, res) => {
       userInformation[0].save().then(res.send(userInformation[0].books));
       console.log(userInformation[0].books);
     }
-    
+  });
+});
+
+app.delete('/books/:id', (req, res) => {
+  const userDelete = req.query.queryfield;
+  console.log('this is the user whose book I\'m deleting:', userDelete);
+  User.find({email: userDelete}, (err, userInformation) => {
+    console.log(userInformation);
+    let usersBooks = userInformation[0].books;
+    usersBooks = usersBooks.filter(book => `${book._id}` !== req.params.id);
+    console.log(usersBooks);
+    userInformation[0].books = usersBooks;
+    userInformation[0].save().then(userInformation => {
+      res.send(userInformation.books);
+      res.send('Your book has been deleted')
+    });
   });
 });
 
